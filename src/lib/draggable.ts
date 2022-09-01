@@ -19,6 +19,7 @@ export function dragMe(node) {
 
     window.addEventListener('mousemove', (e) => {
         if (moving) {
+ 
             node.style.position = 'absolute';
             top += e.movementY;
             left += e.movementX;

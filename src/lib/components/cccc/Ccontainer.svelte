@@ -1,24 +1,31 @@
-<script lang="ts">
-	import { marked } from 'marked';
-	import SvelteMarkdown from 'svelte-markdown';
+<!-- 
+TODOS:
+- sanitize: https://svelte.dev/repl/29769379eb7144fba879a9737c5f96f5?version=3.49.0
+-   import SvelteMarkdown from 'svelte-markdown';
 
+- https://magidoc.js.org/svelte-plugins/marked
+-->
+<script lang="ts">
+	import Markdown from '@magidoc/plugin-svelte-marked';
+	import MarkdownHeading from '../Markdown/MarkdownHeading.svelte';
+	import MarkdownCode from '../Markdown/Code/MarkdownCode.svelte';
+
+	const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
+
+	export let debug: boolean = false;
 	export let id: string;
 	export let title: string;
 	export let context: string = '';
-	let description = `### This is a header
+	export let description = ``;
+	export let cellSize: number = 10;
 
-This is a paragraph.
-
-| And this is | A table |
-|-------------|---------|
-| With two    | columns |
-| With two    | columns |
-
-`;
+	description = description ?? '';
 
 	export let element;
 	export let initX = '';
 	export let initY = '';
+
+	const tolerance = 7;
 
 	let viewMarkdown = false;
 
@@ -28,17 +35,33 @@ This is a paragraph.
 	let left: number = isNaN(parseInt(initX)) ? 0 : parseInt(initX);
 	let top: number = isNaN(parseInt(initY)) ? 0 : parseInt(initY);
 
+	let moving = false;
+
+	$: display_preview = moving ? 'flex' : 'none';
+
+	$: left_suggest = moving
+		? clamp(
+				left % cellSize,
+				Math.floor(left / cellSize) * cellSize,
+				Math.ceil(left / cellSize) * cellSize + cellSize
+		  )
+		: left;
+	$: top_suggest = moving
+		? clamp(
+				top % cellSize,
+				Math.floor(top / cellSize) * cellSize,
+				Math.ceil(top / cellSize) * cellSize + cellSize
+		  )
+		: top;
 
 	export function dragMe(node) {
-		let moving = false;
-
 		// node.style.position = 'absolute';
 		node.style.top = `${top}px`;
 		node.style.left = `${left}px`;
 		node.style.cursor = 'move';
 		node.style.userSelect = 'none';
 
-		node.addEventListener('mousedown', () => {
+		node.addEventListener('mousedown', (e) => {
 			moving = true;
 		});
 
@@ -53,38 +76,86 @@ This is a paragraph.
 		});
 
 		window.addEventListener('mouseup', () => {
-			moving = false;
+			if (moving) {
+				// let restTop = top % cellSize;
+				// let restLeft = left % cellSize;
+				// let divCountTop = Math.floor(top / cellSize);
+				// let divCountLeft = Math.floor(left / cellSize);
+
+				left = left_suggest;
+				top = top_suggest;
+				node.style.top = `${top}px`;
+				node.style.left = `${left}px`;
+				moving = false;
+			}
 		});
 	}
 </script>
 
+<div
+	class="suggestion"
+	style="left: {left_suggest}px;top:{top_suggest}px;position: absolute;background-color: gray;width: {width}px;display:{display_preview};height: {parseInt(
+		height
+	) + parseInt(cellSize)}px;"
+>
+	test-descriptions
+</div>
+
 <!-- {@html marked(title)} -->
+<!-- <h1 id="header-context-path">{context}/{title}</h1> -->
 <div class="wrapper" use:dragMe style="--width-px: {width}px;--height-px: {height}px">
-	<h1 id="header-context-path">{context}/{title}</h1>
 	<div {id} class="objects" bind:this={element} data-init-x="0" data-init-y="0">
 		{#if viewMarkdown}
-			<SvelteMarkdown source={description} />
-
-			<!-- {@html marked(description)} -->
+			<div class="markdown-div">
+				<Markdown
+					source={description}
+					renderers={{
+						heading: MarkdownHeading,
+						code: MarkdownCode
+					}}
+				/>
+			</div>
 		{:else}
 			<textarea bind:value={description} />
 		{/if}
 	</div>
-	<div class="debug">
+	<div class="{debug ? "debug" :"hide"}">
 		<p>Object {id}</p>
 		<p><span>left: </span><input bind:value={left} readonly /></p>
 		<p><span>top: </span><input bind:value={top} readonly /></p>
 		<p><span>width: </span><span contenteditable="true" bind:innerHTML={width} /></p>
 		<p><span>height: </span><span contenteditable="true" bind:innerHTML={height} /></p>
 		<label class="switch">
-			<input type="checkbox" checked>
-			<span class="slider"></span>
-		  </label><br><br>
+			<input type="checkbox" bind:checked={viewMarkdown} />
+			<span class="slider" />
+		</label><br /><br />
 	</div>
 </div>
 
 <!-- width/height: {width}/{height} -->
 <style type="scss">
+	@mixin flex-mixin($align: center) {
+		align-items: $align;
+		display: flex;
+		flex-direction: column;
+	}
+	@mixin border-radius($radius) {
+		-webkit-border-radius: $radius;
+		-moz-border-radius: $radius;
+		-ms-border-radius: $radius;
+		border-radius: $radius;
+	}
+
+	.markdown-div {
+		@include flex-mixin(flex-start);
+		margin-block-start: 0em;
+		margin-block-end: 0em;
+		background-color: rgb(234, 234, 234);
+		padding: 5px;
+		width: 100%;
+		@include border-radius(2px);
+	}
+
 	#header-context-path {
 		position: relative;
 		width: auto;
@@ -92,10 +163,9 @@ This is a paragraph.
 		margin-block-end: 0em;
 	}
 
-	@mixin flex-mixin($align: center) {
-		align-items: $align;
-		display: flex;
-		flex-direction: column;
+	.suggestion{
+		@include border-radius(5px);
+		opacity: 0.5;
 	}
 
 	.objects {
@@ -123,12 +193,17 @@ This is a paragraph.
 	}
 	.debug {
 		position: relative;
+		display: flex;
+	}
+	.hide {
+		display: none;
 	}
 	p {
 		margin-block-start: 0em;
 		margin-block-end: 0em;
 	}
 	.wrapper {
+		z-index: 100;
 		position: absolute;
 	}
 </style>

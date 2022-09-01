@@ -1,16 +1,13 @@
 <script lang="ts">
 	import CContainer from '../lib/components/cccc/Ccontainer.svelte';
+	import { webdescription, appdescription } from '../lib/markdown/test-descriptions';
 	var cellSize = 50;
 	var objectSize = 150;
 	var rows = 12;
 	var cols = 18;
 	var snap = 50;
 
-	let objects = [
-		{ el: null, id: 1, title: "Ele1",description: "i am a sample *description*"},
-		{ el: null, id: 2, title: "Ele2" },
-		{ el: null, id: 3, title: "Ele3" }
-	];
+	let debug = true;
 
 	let dropped = [];
 	let status = '';
@@ -23,6 +20,11 @@
 		x: number;
 		y: number;
 	};
+
+	let objects = [
+		{ el: null, id: 1, title: 'Svelete-Web-App', description: webdescription },
+		{ el: null, id: 2, title: 'DENO-API', description: appdescription }
+	];
 
 	let cellArray: cellObjectType[] = [];
 
@@ -83,7 +85,11 @@
 	let color = '#ff3e00';
 </script>
 
-<h1><a href="https://github.com/svelete-ui/sass-grid-app-profile">github.com/svelete-ui/sass-grid-app-profile</a></h1>
+<h1>
+	<a href="https://github.com/svelete-ui/sass-grid-app-profile"
+		>github.com/svelete-ui/sass-grid-app-profile</a
+	>
+</h1>
 <!-- <h1><a href="https://github.com/robenkleene/artboard">github.com/robenkleene/artboard</a></h1> -->
 <!-- <div  style="position:relative;height:{height+1}px;width:{width+2}px;" class="artboard-overlay" /> -->
 
@@ -102,11 +108,14 @@
 			description="test"
  -->
 	{#each objects.filter((v) => v) as { id }, i}
-		<CContainer 
-		bind:element={objects[i].el} 
-		id={id.toString()} 
-		title="{objects[i].title}" 
-	 />
+		<CContainer
+			description={objects[i].description}
+			bind:element={objects[i].el}
+			id={id.toString()}
+			title={objects[i].title}
+			cellSize={cellSize}
+			debug={debug}
+		/>
 	{/each}
 
 	{#each cellArray as cell}
@@ -136,7 +145,6 @@
 >
 
 <style type="scss">
-
 	$artboard-grid-px: 15px !default;
 	$artboard-grid-color: rgba(0, 0, 0, 0.25) !default;
 	$artboard-divider-interval: 15 !default;
