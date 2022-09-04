@@ -1,0 +1,8 @@
+{
+    "title": "My-Project",
+    "timeZone": "Europe/Berlin",
+    "repository": {
+        "type": "org|user",
+        "apiBaseUrl": "https://api.github.com"
+    }
+}

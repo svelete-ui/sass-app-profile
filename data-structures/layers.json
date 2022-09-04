@@ -1,0 +1,16 @@
+["system-context","containers","components","code"]
+
+// components will show: code language mentions  
+// code will show: code language and explicit folders/file mentions
+
+// each code has a repository attribute --> unique flattend list per context/container/component
+
+// TODO: types folder with point and ccontainer type --> inputs/outputs/ layer etc
+
+// TODO: hence parent resources can always show ALL their child contents it makes sense to build the 
+// corresponding type structure!
+// container
+// {
+//      children: [otherContainers...]
+// }
+//  --> filter content recursive for all children

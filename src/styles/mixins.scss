@@ -1,0 +1,38 @@
+@mixin flex-mixin($align: center, $direction: column) {
+    align-items: $align;
+    display: flex;
+    flex-direction: $direction;
+}
+
+@mixin border-radius($radius) {
+    -webkit-border-radius: $radius;
+    -moz-border-radius: $radius;
+    -ms-border-radius: $radius;
+    border-radius: $radius;
+}
+
+@mixin icon-mixin($backgroundrgb, $borderrgb, $height, $width) {
+    background-color: rgba($backgroundrgb, .8);
+    border: solid 1px $borderrgb;
+    height: $height;
+
+    &:hover{
+        box-shadow: 2px 2px 5px #f09;
+        background-color: rgba($backgroundrgb, .9);
+    }
+
+    @if $width != $height {
+        width: $width;
+    }
+    @else {
+        width: $height;
+    }
+}
+
+@mixin dottedBackground {
+    // https://codepen.io/fractiunate/pen/PoeoYqZ
+    background-image: radial-gradient(#212121 20%, transparent 20%);
+    background-color: $background-dark;
+    background-position: 0 0 6px 6px;
+    background-size: 6px 6px;
+}

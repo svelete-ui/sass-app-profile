@@ -1,6 +1,9 @@
 <script lang="ts">
+import Arrow from '$lib/components/Arrow/arrow.svelte';
+
 	import CContainer from '../lib/components/cccc/Ccontainer.svelte';
 	import { webdescription, appdescription } from '../lib/markdown/test-descriptions';
+
 	var cellSize = 50;
 	var objectSize = 150;
 	var rows = 12;

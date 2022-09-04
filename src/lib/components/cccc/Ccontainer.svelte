@@ -134,18 +134,7 @@ TODOS:
 
 <!-- width/height: {width}/{height} -->
 <style type="scss">
-	@mixin flex-mixin($align: center) {
-		align-items: $align;
-		display: flex;
-		flex-direction: column;
-	}
-	@mixin border-radius($radius) {
-		-webkit-border-radius: $radius;
-		-moz-border-radius: $radius;
-		-ms-border-radius: $radius;
-		border-radius: $radius;
-	}
-
+	@import "../../../styles/mixins.scss";
 	.markdown-div {
 		@include flex-mixin(flex-start);
 		margin-block-start: 0em;

@@ -1,6 +1,1 @@
-.wrapper {
-    h1 {
-        color: cornflowerblue;
-    
-    }
-}
+:global(body) { /* this will apply to <body> */ margin: 0; padding: 0; }
